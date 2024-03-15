@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">das_entrega1</string>
+    <string name="guardar">Guardar</string>
+    <string name="titulo">Título</string>
+    <string name="descr">Descripción</string>
+    <string name="genero">Género</string>
+    <string name="tags">Etiquetas</string>
+    <string name="rating">Calificación</string>
+    <string name="compartir">Compartir</string>
+    <string name="programar">Programar</string>
+    <string name="añadir">Añadir</string>
+    <string name="lang">English</string>
+</resources>
