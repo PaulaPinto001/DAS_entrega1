@@ -13,8 +13,6 @@ import android.widget.TextView
 class MovieListAdapter(context: Context, movies: ArrayList<Pelicula>) :
     ArrayAdapter<Pelicula>(context, 0, movies) {
 
-    private var peliculas : ArrayList<Pelicula> = movies
-
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         var itemView = convertView
         if (itemView == null) {
@@ -45,7 +43,7 @@ class MovieListAdapter(context: Context, movies: ArrayList<Pelicula>) :
                 "Musical" -> R.drawable.poster_musical
                 "Terror" -> R.drawable.poster_terror
                 "Ciencia ficción" -> R.drawable.poster_scifi
-                else -> {R.drawable.poster_default}
+                else -> R.drawable.poster_default
             }
             imageView_poster.setImageResource(posterDrawableId)
         }
@@ -54,13 +52,14 @@ class MovieListAdapter(context: Context, movies: ArrayList<Pelicula>) :
     }
 
     fun anadirPelicula(pelicula: Pelicula) {
-        peliculas.add(pelicula)
+        add(pelicula)
         notifyDataSetChanged()
     }
 
     fun eliminarPelicula(pelicula: Pelicula) {
-        peliculas.remove(pelicula)
+        remove(pelicula)
         notifyDataSetChanged()
     }
 }
+
 

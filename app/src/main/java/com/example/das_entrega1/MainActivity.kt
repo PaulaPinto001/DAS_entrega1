@@ -44,11 +44,11 @@ class MainActivity : AppCompatActivity() {
 
         if (primeraEjec) { //Introducir películas de muestra en la primera ejecución de la aplicación
 
-            gestorBD.insertarPelicula("El Rey León", "Una película sobre un joven león que lucha por reclamar su lugar como rey", "Animación, Aventura", "Animación", 8.5f)
+            gestorBD.insertarPelicula("El Rey León", "Una película sobre un joven león que lucha por reclamar su lugar como rey", "Animación, Aventura", "Animación", 4.5f)
             gestorBD.insertarPelicula("Titanic", "Una película épica de romance y desastre dirigida por James Cameron", "Romance, Drama", "Romance", 2.0f)
-            gestorBD.insertarPelicula("El Padrino", "Una película sobre la mafia", "Crimen, Drama", "Drama", 9.2f)
-            gestorBD.insertarPelicula("Interestelar", "Una aventura épica en el espacio", "Ciencia ficción, Aventura", "Ciencia ficción", 9.8f)
-            gestorBD.insertarPelicula("El Señor de los Anillos: La Comunidad del Anillo", "Un hobbit se embarca en una aventura para destruir un anillo maligno", "Fantasía, Aventura", "Fantasía", 8.8f)
+            gestorBD.insertarPelicula("El Padrino", "Una película sobre la mafia", "Crimen, Drama", "Drama", 3.5f)
+            gestorBD.insertarPelicula("Interestelar", "Una aventura épica en el espacio", "Ciencia ficción, Aventura", "Ciencia ficción", 4.8f)
+            gestorBD.insertarPelicula("El Señor de los Anillos: La Comunidad del Anillo", "Un hobbit se embarca en una aventura para destruir un anillo maligno", "Fantasía, Aventura", "Fantasía", 3.0f)
 
             primeraEjec = !primeraEjec
             // Guardar el estado actualizado en SharedPreferences
