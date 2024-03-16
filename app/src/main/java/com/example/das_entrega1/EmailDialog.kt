@@ -6,12 +6,18 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.widget.EditText
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.DialogFragment
+import android.Manifest
 
 class EmailDialog(titulo : String) : DialogFragment() {
 
@@ -56,7 +62,6 @@ class EmailDialog(titulo : String) : DialogFragment() {
         }
         if (intent.resolveActivity(requireActivity().packageManager) != null) {
             startActivity(intent)
-
             lanzarNotificacion()
 
         } else {
@@ -65,28 +70,39 @@ class EmailDialog(titulo : String) : DialogFragment() {
     }
 
     private fun lanzarNotificacion() {
-        val notificationManager = requireActivity().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        // Pedir permisos de notificación
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS)
+            != PackageManager.PERMISSION_GRANTED) {
+            // PEDIR EL PERMISO
+            ActivityCompat.requestPermissions(requireActivity(),
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1)
+        } else {
+            val manager = requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        val channelId = "default_channel_id"
-        val channelName = "Default Channel"
-        val importance = NotificationManager.IMPORTANCE_DEFAULT
+            // Crear canal de notificación
+            val channelId = "IdCanal"
+            val channelName = "NombreCanal"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val elCanal = NotificationChannel(channelId, channelName, importance)
+            manager.createNotificationChannel(elCanal)
 
-        val notificationChannel = NotificationChannel(channelId, channelName, importance)
-        notificationManager.createNotificationChannel(notificationChannel)
-
-        val notificationBuilder = NotificationCompat.Builder(requireContext(), channelId)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("Correo enviado exitosamente")
-            .setContentText("Tu invitación para ver " + titulo + " se ha enviado correctamente")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-
-        notificationManager.notify(0, notificationBuilder.build())
+            // Construir y mostrar notificación
+            val builder = NotificationCompat.Builder(requireContext(), channelId)
+                .setSmallIcon(android.R.drawable.stat_sys_warning)
+                .setContentTitle("Invitación lanzada")
+                .setContentText("Tu invitación a $email se ha lanzado con éxito")
+                .setVibrate(longArrayOf(0, 1000, 500, 1000))
+                .setAutoCancel(true)
+            manager.notify(1, builder.build())
+        }
     }
 
+
+
     override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
         outState.putString("titulo", titulo)
         outState.putString("email", email)
-        super.onSaveInstanceState(outState)
     }
 
 }
