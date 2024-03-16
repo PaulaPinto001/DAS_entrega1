@@ -1,53 +1,62 @@
 package com.example.das_entrega1
 
-import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.widget.AdapterView
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ListView
-import android.widget.ToggleButton
 import androidx.activity.result.contract.ActivityResultContracts
-import com.google.android.material.chip.Chip
 import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var listaPeliculas : ListView
-    private lateinit var btn_añadir : Button
+    private lateinit var btn_anadir : Button
     private lateinit var btn_cambioIdioma : Button
 
     private lateinit var gestorBD : GestorBD
     private lateinit var adapter : MovieListAdapter
 
     // Variable para almacenar el estado actual del idioma
-    private var ingles = false
+    private var ingles : Boolean = false
+    private var primeraEjec : Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Crear una instancia de SharedPreferences
+        val prefs = getSharedPreferences("Preferencias", Context.MODE_PRIVATE)
+        // Recuperar los valores de SharedPreferences
+        ingles = prefs.getBoolean("ingles", true)
+        primeraEjec = prefs.getBoolean("primeraEjec", true)
+
         //Buscar elementos de la UI
         listaPeliculas = findViewById(R.id.listView_movies)
-        btn_añadir = findViewById(R.id.button_añadir)
+        btn_anadir = findViewById(R.id.button_añadir)
         btn_cambioIdioma = findViewById(R.id.button_lang)
 
         //Inicializar base de datos y obtener lista de todas las películas almacenadas
         gestorBD = GestorBD(this)
 
-        gestorBD.insertarPelicula("El Rey León", "Una película sobre un joven león que lucha por reclamar su lugar como rey", "Animación, Aventura", "Animación", 8.5f)
+        if (primeraEjec) { //Introducir películas de muestra en la primera ejecución de la aplicación
 
-        gestorBD.insertarPelicula("Titanic", "Una película épica de romance y desastre dirigida por James Cameron", "Romance, Drama", "Romance", 7.8f)
+            gestorBD.insertarPelicula("El Rey León", "Una película sobre un joven león que lucha por reclamar su lugar como rey", "Animación, Aventura", "Animación", 8.5f)
+            gestorBD.insertarPelicula("Titanic", "Una película épica de romance y desastre dirigida por James Cameron", "Romance, Drama", "Romance", 2.0f)
+            gestorBD.insertarPelicula("El Padrino", "Una película sobre la mafia", "Crimen, Drama", "Drama", 9.2f)
+            gestorBD.insertarPelicula("Interestelar", "Una aventura épica en el espacio", "Ciencia ficción, Aventura", "Ciencia ficción", 9.8f)
+            gestorBD.insertarPelicula("El Señor de los Anillos: La Comunidad del Anillo", "Un hobbit se embarca en una aventura para destruir un anillo maligno", "Fantasía, Aventura", "Fantasía", 8.8f)
 
-        gestorBD.insertarPelicula("El Padrino", "Una película sobre la mafia", "Crimen, Drama", "Drama", 9.2f)
-
-        gestorBD.insertarPelicula("Interestelar", "Una aventura épica en el espacio", "Ciencia ficción, Aventura", "Aventura", 8.6f)
-
-        gestorBD.insertarPelicula("El Señor de los Anillos: La Comunidad del Anillo", "Un hobbit se embarca en una aventura para destruir un anillo maligno", "Fantasía, Aventura", "Fantasía", 8.8f)
-
+            primeraEjec = !primeraEjec
+            // Guardar el estado actualizado en SharedPreferences
+            with(prefs.edit()) {
+                putBoolean("primeraEjec", primeraEjec)
+                apply()
+            }
+        }
 
         val peliculas = gestorBD.obtenerTodasLasPeliculas()
 
@@ -82,13 +91,13 @@ class MainActivity : AppCompatActivity() {
                         )
 
                         //Añadirla al listView
-                        adapter.añadirPelicula(pelicula)
+                        adapter.anadirPelicula(pelicula)
 
                     }
                 }
             }
 
-        btn_añadir.setOnClickListener {
+        btn_anadir.setOnClickListener {
             val i = Intent(this@MainActivity, ActivityAnadirPelicula::class.java)
             startActivityIntent.launch(i)
         }
@@ -104,6 +113,12 @@ class MainActivity : AppCompatActivity() {
             // Actualizar el estado del idioma
             ingles = !ingles
 
+            // Guardar el estado actualizado en SharedPreferences
+            with(prefs.edit()) {
+                putBoolean("ingles", ingles)
+                apply()
+            }
+
             // Recrear la actividad para que los cambios surtan efecto
             recreate()
         }
@@ -116,6 +131,16 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        listaPeliculas.setOnItemLongClickListener { parent, view, position, id ->
+            val peliculaSeleccionada = adapter.getItem(position)
+            if (peliculaSeleccionada != null) {
+                eliminarPelicula(peliculaSeleccionada)
+                true
+            }
+            else{
+                false
+            }
+        }
     }
 
     private fun cambiarIdioma(languageCode: String) {
@@ -139,5 +164,26 @@ class MainActivity : AppCompatActivity() {
             // Puedes agregar más extras según sea necesario
         }
         startActivity(intent)
+    }
+
+    private fun eliminarPelicula(pelicula : Pelicula) {
+        adapter.eliminarPelicula(pelicula)
+        gestorBD.eliminarPelicula(pelicula.getId())
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        // Guardar el estado de primeraEjec y ingles cuando la actividad se destruye
+        outState.putBoolean("primeraEjec", primeraEjec)
+        outState.putBoolean("ingles", ingles)
+
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+
+        // Restaurar el estado de primeraEjec y ingles cuando la actividad se recrea
+        primeraEjec = savedInstanceState.getBoolean("primeraEjec", false)
+        ingles = savedInstanceState.getBoolean("ingles")
     }
 }

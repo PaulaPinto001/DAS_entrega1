@@ -62,7 +62,25 @@ class ActivityDetalles : AppCompatActivity() {
             val emailDialog = EmailDialog(titulo)
             emailDialog.show(supportFragmentManager, "EmailDialog")
         }
+    }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString("titulo", textView_titulo.text.toString())
+        outState.putString("genero", textView_genero.text.toString())
+        outState.putString("descripcion", textView_descr.text.toString())
+        outState.putString("tags", textView_tags.text.toString())
+        outState.putFloat("rating", ratingBar.rating)
+
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        textView_titulo.text = savedInstanceState.getString("titulo") ?: ""
+        textView_genero.text = savedInstanceState.getString("genero") ?: ""
+        textView_descr.text = savedInstanceState.getString("descripcion") ?: ""
+        textView_tags.text = savedInstanceState.getString("tags") ?: ""
+        ratingBar.rating = savedInstanceState.getFloat("rating", 0f)
     }
 
 }

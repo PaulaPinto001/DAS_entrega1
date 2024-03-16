@@ -7,7 +7,6 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.widget.EditText
 import android.widget.Toast
@@ -16,7 +15,16 @@ import androidx.fragment.app.DialogFragment
 
 class EmailDialog(titulo : String) : DialogFragment() {
 
-    private var titulo = titulo
+    private var titulo : String = titulo
+    private lateinit var email : String
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        savedInstanceState?.let {
+            titulo = it.getString("titulo").toString()
+            email = it.getString("email").toString()
+        }
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val inflater = requireActivity().layoutInflater
@@ -27,7 +35,7 @@ class EmailDialog(titulo : String) : DialogFragment() {
             .setTitle("Introduce el correo electrónico del destinatario")
             .setView(dialogView)
             .setPositiveButton("Enviar") { dialog, _ ->
-                val email = editTextEmail.text.toString()
+                email = editTextEmail.text.toString()
                 enviarCorreo(email)
                 dialog.dismiss()
             }
@@ -63,10 +71,8 @@ class EmailDialog(titulo : String) : DialogFragment() {
         val channelName = "Default Channel"
         val importance = NotificationManager.IMPORTANCE_DEFAULT
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationChannel = NotificationChannel(channelId, channelName, importance)
-            notificationManager.createNotificationChannel(notificationChannel)
-        }
+        val notificationChannel = NotificationChannel(channelId, channelName, importance)
+        notificationManager.createNotificationChannel(notificationChannel)
 
         val notificationBuilder = NotificationCompat.Builder(requireContext(), channelId)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
@@ -75,6 +81,12 @@ class EmailDialog(titulo : String) : DialogFragment() {
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
         notificationManager.notify(0, notificationBuilder.build())
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString("titulo", titulo)
+        outState.putString("email", email)
+        super.onSaveInstanceState(outState)
     }
 
 }

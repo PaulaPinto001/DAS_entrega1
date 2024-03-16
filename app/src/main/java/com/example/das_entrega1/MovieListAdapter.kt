@@ -53,8 +53,13 @@ class MovieListAdapter(context: Context, movies: ArrayList<Pelicula>) :
         return itemView
     }
 
-    fun añadirPelicula(pelicula: Pelicula) {
+    fun anadirPelicula(pelicula: Pelicula) {
         peliculas.add(pelicula)
+        notifyDataSetChanged()
+    }
+
+    fun eliminarPelicula(pelicula: Pelicula) {
+        peliculas.remove(pelicula)
         notifyDataSetChanged()
     }
 }

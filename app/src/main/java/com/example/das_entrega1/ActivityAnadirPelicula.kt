@@ -3,10 +3,8 @@ package com.example.das_entrega1
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
-import android.widget.RadioGroup
 import android.widget.RatingBar
 import android.widget.Spinner
 import android.widget.Toast
@@ -20,6 +18,12 @@ class ActivityAnadirPelicula : AppCompatActivity() {
     private lateinit var inputRating: RatingBar
     private lateinit var inputGenero: Spinner
     private lateinit var btnGuardar: Button
+
+    private var tituloText: String = ""
+    private var descripcionText: String = ""
+    private var tagsText: String = ""
+    private var ratingValue: Float = 0f
+    private var generoIndex: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,17 +39,35 @@ class ActivityAnadirPelicula : AppCompatActivity() {
         btnGuardar.setOnClickListener {
             guardarInformacion()
         }
+
+        // Restaurar estado si savedInstanceState no es nulo
+        savedInstanceState?.let {
+            tituloText = it.getString("titulo", "")
+            descripcionText = it.getString("descripcion", "")
+            tagsText = it.getString("tags", "")
+            ratingValue = it.getFloat("rating", 0f)
+            generoIndex = it.getInt("generoIndex", 0)
+            actualizarUI()
+        }
+    }
+
+    private fun actualizarUI() {
+        inputTitulo.setText(tituloText)
+        inputDescripcion.setText(descripcionText)
+        inputTags.setText(tagsText)
+        inputRating.rating = ratingValue
+        inputGenero.setSelection(generoIndex)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString("titulo", inputTitulo.text.toString())
+        outState.putString("descripcion", inputDescripcion.text.toString())
+        outState.putString("tags", inputTags.text.toString())
+        outState.putFloat("rating", inputRating.rating)
+        outState.putInt("generoIndex", inputGenero.selectedItemPosition)
+
         super.onSaveInstanceState(outState)
-
     }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-    }
-
 
     private fun guardarInformacion() {
         val titulo = inputTitulo.text.toString()
